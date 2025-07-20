@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Інтимна Гра для Пар</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .game-area {
+            margin: 30px 0;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .player-button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border: none;
+            color: white;
+            padding: 20px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px 0 rgba(238, 90, 36, 0.4);
+            min-width: 150px;
+        }
+
+        .player-button.her {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+        }
+
+        .player-button.him {
+            background: linear-gradient(45deg, #4834d4, #686de0);
+            box-shadow: 0 4px 15px 0 rgba(72, 52, 212, 0.4);
+        }
+
+        .player-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .player-button:active {
+            transform: translateY(0);
+        }
+
+        .task-display {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .task-text {
+            font-size: 1.3rem;
+            line-height: 1.6;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .current-turn {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        .timer {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffd93d;
+            margin-top: 15px;
+        }
+
+        .reset-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .reset-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .welcome-text {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .buttons-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .player-button {
+                padding: 15px 30px;
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💕 Інтимна Гра 💕</h1>
+        
+        <div class="current-turn" id="currentTurn">Натисніть кнопку, щоб почати гру</div>
+        
+        <div class="buttons-container">
+            <button class="player-button her" onclick="getTask('her')">Для Неї 💃</button>
+            <button class="player-button him" onclick="getTask('him')">Для Нього 🕺</button>
+        </div>
+
+        <div class="task-display">
+            <div class="task-text" id="taskText">
+                <div class="welcome-text">
+                    Ласкаво просимо до інтимної гри для пар! 🔥<br>
+                    Натисніть на одну з кнопок, щоб отримати завдання.<br>
+                    Насолоджуйтесь один одним! 💖
+                </div>
+            </div>
+        </div>
+
+        <div class="timer" id="timer"></div>
+
+        <button class="reset-button" onclick="resetGame()">Нова гра</button>
+    </div>
+
+    <script>
+        let currentPlayer = null;
+        let taskTimer = null;
+
+        const tasks = {
+            her: [
+                "30 секунд ніжного масажу його шиї та плечей 💆‍♂️",
+                "1 хвилина пристрасних поцілунків 💋",
+                "45 секунд ніжного дотику руками по всьому тілу ✋",
+                "Сядь на обличчя партнера",
+                "2 хвилини орального задоволення 👄",
+                "30 секунд шепоту на вухо про свої бажання 🗣️",
+                "1 хвилина стриптизу💃",
+                "45 секунд масажу його ніг 🦵",
+                "30 секунд покусування його вуха 👂",
+                "1 хвилина ніжних поцілунків по всьому тілу 💕",
+                "2 хвилини використання рук для його задоволення ✋",
+                "45 секунд дражніння язиком 👅",
+                "30 секунд дихання на його шию 💨"
+            ],
+            him: [
+                "45 секунд ніжного масажу її ніг 🦵",
+                "1 хвилина пристрасних поцілунків її шиї 💋",
+                "2 хвилини орального задоволення 👄",
+                "30 секунд ніжного дотику до її грудей ✋",
+                "1 хвилина масажу її спини 💆‍♀️",
+                "45 секунд поцілунків її живота 💕",
+                "30 секунд шепоту компліментів на вухо 🗣️",
+                "1 хвилина ніжних дотиків руками 👐",
+                "2 хвилини використання язика для її задоволення 👅",
+                "45 секунд масажу її плечей та шиї 💆‍♀️",
+                "30 секунд ніжного покусування її губ 💋",
+                "1 хвилина дотиків пальцями по всьому тілу ✋"
+            ]
+        };
+
+        function getTask(player) {
+            currentPlayer = player;
+            const taskList = tasks[player];
+            const randomTask = taskList[Math.floor(Math.random() * taskList.length)];
+            
+            document.getElementById('taskText').innerHTML = randomTask;
+            
+            const playerName = player === 'her' ? 'Її' : 'Його';
+            document.getElementById('currentTurn').textContent = `Зараз черга: ${playerName}`;
+            
+            // Витягуємо час з тексту завдання
+            const timeMatch = randomTask.match(/(\d+)\s+(секунд|хвилин|хвилину|хвилини)/);
+            if (timeMatch) {
+                let seconds;
+                const number = parseInt(timeMatch[1]);
+                const unit = timeMatch[2];
+                
+                if (unit.includes('хвилин') || unit.includes('хвилину')) {
+                    seconds = number * 60;
+                } else {
+                    seconds = number;
+                }
+                
+                startTimer(seconds);
+            }
+        }
+
+        function startTimer(seconds) {
+            clearInterval(taskTimer);
+            let timeLeft = seconds;
+            
+            const timerElement = document.getElementById('timer');
+            timerElement.style.display = 'block';
+            
+            function updateTimer() {
+                const minutes = Math.floor(timeLeft / 60);
+                const secs = timeLeft % 60;
+                timerElement.textContent = `⏰ ${minutes}:${secs.toString().padStart(2, '0')}`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(taskTimer);
+                    timerElement.textContent = '⏰ Час вийшов! Черга партнера 💕';
+                    setTimeout(() => {
+                        timerElement.style.display = 'none';
+                        document.getElementById('currentTurn').textContent = 'Натисніть кнопку для наступного завдання';
+                    }, 3000);
+                    return;
+                }
+                
+                timeLeft--;
+            }
+            
+            updateTimer();
+            taskTimer = setInterval(updateTimer, 1000);
+        }
+
+        function resetGame() {
+            clearInterval(taskTimer);
+            currentPlayer = null;
+            document.getElementById('taskText').innerHTML = `
+                <div class="welcome-text">
+                    Ласкаво просимо до інтимної гри для пар! 🔥<br>
+                    Натисніть на одну з кнопок, щоб отримати завдання.<br>
+                    Насолоджуйтесь один одним! 💖
+                </div>
+            `;
+            document.getElementById('currentTurn').textContent = 'Натисніть кнопку, щоб почати гру';
+            document.getElementById('timer').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
